@@ -1,8 +1,6 @@
 import random
 import time
 
-random.seed(1)
-
 
 class Cell:
     def __init__(self):
@@ -44,28 +42,22 @@ class Field:
         self.game_is_continues = True
 
     def click_on_field(self, x: int, y: int, left_mouse=True):
-        print(f"{self.game_is_continues=}, {self.is_win()=}, {self.lose=}")
         if not self.game_is_continues:
             return
 
         if left_mouse:
             if not self.field[x][y].is_flag:
                 self.open_cell(x, y)
-                print('открыли клетку')
                 if self.is_lose(x, y):
-                    self.show_field()
                     self.game_is_continues = False
-                    print('Вы Проиграли')
                     return 0
 
         else:
             self.flag_cell(x, y)
 
-        self.show_field()
 
         if self.is_win():
             self.game_is_continues = False
-            print('Поздравляю, вы выиграли')
             return 1
 
     def open_cell(self, x: int, y: int) -> None:
@@ -87,12 +79,6 @@ class Field:
     def flag_cell(self, x: int, y: int) -> None:
         self.field[x][y].flag()
 
-    def show_field(self) -> None:
-        for x in self.field:
-            for y in x:
-                print(y, end=' ')
-            print()
-        print()
 
     def is_lose(self, x: int, y: int) -> bool:
         if self.field[x][y].mine:
@@ -145,24 +131,3 @@ class Field:
                 if self.field[x_i][y_i].mine:
                     cnt += 1
         return cnt
-
-
-if __name__ == "__main__":
-    start = time.time()
-    MineSweeper = Field(5, 5, 5)
-    MineSweeper.start_game()
-    # MineSweeper.click_on_field(4, 0, left_mouse=True)
-    # MineSweeper.click_on_field(0, 2, right_mouse=True)
-    # MineSweeper.click_on_field(0, 3, left_mouse=True)
-    # MineSweeper.click_on_field(0, 4, right_mouse=True)
-    # MineSweeper.click_on_field(1, 3, right_mouse=True)
-    # MineSweeper.click_on_field(1, 4, left_mouse=True)
-    # MineSweeper.click_on_field(2, 3, left_mouse=True)
-    # MineSweeper.click_on_field(2, 4, left_mouse=True)
-    # MineSweeper.click_on_field(3, 3, right_mouse=True)
-    # MineSweeper.click_on_field(3, 3, left_mouse=True)
-    # MineSweeper.click_on_field(3, 4, left_mouse=True)
-    # MineSweeper.click_on_field(4, 3, left_mouse=True)
-    # MineSweeper.click_on_field(4, 4, right_mouse=True)
-    end = time.time()
-    print(f'{end-start}')

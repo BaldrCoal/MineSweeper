@@ -17,34 +17,31 @@ clock = pygame.time.Clock()
 
 
 def menu():
-    menu_def = pygame.image.load('img/menu.png')
-    menu_easy = pygame.image.load('img/menu_easy.png')
-    menu_normal = pygame.image.load('img/menu_normal.png')
-    menu_hard = pygame.image.load('img/menu_hard.png')
-    menu_quit = pygame.image.load('img/menu_quit.png')
-    menus = [menu_def, menu_easy, menu_normal, menu_hard, menu_quit]
+    menus = [pygame.image.load('img/menu.png'), pygame.image.load('img/menu_easy.png'),
+             pygame.image.load('img/menu_normal.png'), pygame.image.load('img/menu_hard.png'),
+             pygame.image.load('img/menu_quit.png')]
+    boxes = [pygame.Rect(12, 280, 300, 100), pygame.Rect(350, 280, 300, 100), pygame.Rect(687, 280, 300, 100),
+             pygame.Rect(345, 471, 300, 100)]
     screen = pygame.display.set_mode((1000, 600))
-    rect_easy = pygame.Rect(12, 280, 300, 100)
-    rect_normal = pygame.Rect(350, 280, 300, 100)
-    rect_hard = pygame.Rect(687, 280, 300, 100)
-    rect_quit = pygame.Rect(345, 471, 300, 100)
-    boxes = [rect_easy, rect_normal, rect_hard, rect_quit]
-    difficulties = [(9, 9, 10), (16, 16, 40), (30, 16, 99)]
+    difficulties = [(9, 9, 10), (16, 16, 40), (16, 30, 99)]
 
     while True:
         for event in pygame.event.get():  # User did something
+            if event.type == pygame.QUIT:  # If user clicked close
+                pygame.quit()
+                sys.exit()
             mouse_pos = pygame.mouse.get_pos()
             state = 0
             for ind, box in enumerate(boxes, start=1):
                 if box.collidepoint(mouse_pos):
                     state = ind
-            if event.type == pygame.QUIT:  # If user clicked close
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1 and state < 4:
-                    play(difficulties[state-1])
-                    return
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1 and state < 4:
+                            play(difficulties[state - 1])
+                            return
+                        elif event.button == 1 and state == 4:
+                            pygame.quit()
+                            sys.exit()
         screen.blit(menus[state], (0, 0))
         pygame.display.update()
         clock.tick(60)
@@ -104,15 +101,50 @@ def play(config: tuple):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = get_cell_pos(pygame.mouse.get_pos())
-                print(pygame.mouse.get_pos())
-                print(x, y)
-                print(event)
                 if event.button == 1:
                     game.click_on_field(x, y)
                 elif event.button == 3:
                     game.click_on_field(x, y, left_mouse=False)
         pygame.display.flip()
         draw_cells(screen)
+        pygame.display.update()
+        clock.tick(60)
+        if game.win:
+            game_over(config, win=True)
+        elif game.lose:
+            game_over(config, lose=True)
+
+
+def game_over(config, win=False, lose=False):
+    loses = [pygame.image.load('img/lose.png'), pygame.image.load('img/lose_menu.png'),
+            pygame.image.load('img/lose_restart.png')]
+    wins = [pygame.image.load('img/win.png'), pygame.image.load('img/win_menu.png'),
+           pygame.image.load('img/win_restart.png')]
+    boxes = [pygame.Rect(166, 117, 267, 65), pygame.Rect(166, 222, 267, 65)]
+    screen_over = pygame.display.set_mode((600, 300))
+    if win is True:
+        menus = wins
+    if lose is True:
+        menus = loses
+    while True:
+        for event in pygame.event.get():  # User did something
+            if event.type == pygame.QUIT:  # If user clicked close
+                pygame.quit()
+                sys.exit()
+            mouse_pos = pygame.mouse.get_pos()
+            state = 0
+            for ind, box in enumerate(boxes, start=1):
+                if box.collidepoint(mouse_pos):
+                    state = ind
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.button == 1 and state == 1:
+                            menu()
+                            return
+                        elif event.button == 1 and state == 2:
+                            play(config)
+
+        screen_over.blit(menus[state], (0, 0))
+
         pygame.display.update()
         clock.tick(60)
 
